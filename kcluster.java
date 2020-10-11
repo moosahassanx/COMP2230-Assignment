@@ -122,9 +122,6 @@ class kcluster
 
         makeClusters(hList, stations);
 
-        // TODO: find out where the which hotspots are in which cluster
-        // TODO: find out where the firestations would be located in that cluster
-
         // for each station
         for (int i = 0; i < stations; i++)
         {
@@ -134,16 +131,19 @@ class kcluster
         }
     }
 
+    public static String hotspotPrinter(station s)
+    {
+        String output = "";
+
+        //
+
+        return output;
+    }
+
     public static void makeClusters(ArrayList<hotspot> hList, int stations)
     {
         ArrayList<edges> edgeList = collectEdges(hList);
         ArrayList<edges> MSTedges =  kruskals(edgeList, hList, stations);
-
-        System.out.println("Tree Construction: ");
-        for(int i = 0; i < MSTedges.size(); i++)
-        {
-            MSTedges.get(i).printer();
-        }
 
         // transfer edges data to hotspots
         for(int i = 0; i < MSTedges.size(); i++)
@@ -153,83 +153,86 @@ class kcluster
                 if(MSTedges.get(i).getSrc() == hList.get(j).getID())
                 {
                     int destIndex = MSTedges.get(i).getDest() - 1;
-                    hList.get(j).setDestination(hList.get(destIndex));
+                    hList.get(j).setNext(hList.get(destIndex));
+                }
+            }
+        }
+        for(int i = 0; i < MSTedges.size(); i++)
+        {
+            for(int j = 0; j < hList.size(); j++)
+            {
+                if(MSTedges.get(i).getDest() == hList.get(j).getID())
+                {
+                    int srcIndex = MSTedges.get(i).getSrc() - 1;
+                    hList.get(j).setPrevious(hList.get(srcIndex));
                 }
             }
         }
 
-
         // define clusters using that data on the hotspots
-        ArrayList<ArrayList<hotspot> > clusterOfEdges =  recTest(hList, stations);
+        hList =  clusterMaker(hList, stations);
 
-        for(hotspot h : hList)
+        // arraylists of arraylists
+        ArrayList<ArrayList<hotspot>> clusterArray = new ArrayList<ArrayList<hotspot>>();
+
+        for(int i = 0; i < hList.size(); i++)
         {
-            if(h.getDestination() == null)
+            ArrayList<hotspot> miniArray = new ArrayList<hotspot>();
+
+            hotspot currentNode = hList.get(i);
+            miniArray.add(currentNode);
+            
+            while(currentNode.getPrevious() != null)
             {
-                System.out.println(h.getID() + " -> null");
+                hotspot tempNode = currentNode.getPrevious();
+                miniArray.add(tempNode);
+                currentNode = tempNode;
             }
-            else
+
+            clusterArray.add(miniArray);
+        }
+
+        for(int i = 0; i < clusterArray.size(); i++)
+        {
+            System.out.println("cluster " + (i+1));
+            for(int j = 0; j < clusterArray.get(i).size(); j++)
             {
-                System.out.println(h.getID() + " -> " + h.getDestination().getID());
+                System.out.println(clusterArray.get(i).get(j).getID());
             }
+            System.out.println();
         }
 
-        for(int i = 0; i < stations; i++)
-        {
-            //
-        }
-
-
-
-        /*
-        //TODO: COME BACK TO THIS
-        ArrayList<ArrayList<edges> > clusterOfEdges =  recTest(MSTedges, stations);
-
-        // big array iterator
-        for(int i = 0; i < clusterOfEdges.size(); i++)
-        {
-            // little array iterator
-            for(int j = 0; j < clusterOfEdges.get(i).size(); j++)
-            {
-                //
-            }
-        }
-        */
-
-    }
-
-    public static ArrayList<ArrayList<hotspot> > recTest(ArrayList<hotspot> eList, int clusters)
-    {
-        ArrayList<ArrayList<hotspot> > clusterOfEdges = new ArrayList<ArrayList<hotspot> >();
-
-        //
-        for(int i = 0; i < clusters; i++)
-        {
-            ArrayList<hotspot> miniList = new ArrayList<hotspot>();
-
-            miniList = makeMiniTree(eList);
-
-            clusterOfEdges.add(miniList);
-        }
-
-        return clusterOfEdges;
         
     }
 
-    public static ArrayList<hotspot> makeMiniTree(ArrayList<hotspot> bigTree)
+    public static ArrayList<hotspot> clusterMaker(ArrayList<hotspot> hList, int clusters)
     {
-        ArrayList<hotspot> lilTree = new ArrayList<hotspot>();
+        ArrayList<hotspot> result = new ArrayList<hotspot>();
 
-        return lilTree;
-    }
+        hotspot bigCompare = new hotspot();
+        for(int j = 0; j < clusters; j++)
+        {
+            // find last node
+            hotspot compareNode = new hotspot();
+            for(int i = 0; i < hList.size(); i++)
+            {
+                hotspot lastNode = hList.get(i);
+                while(lastNode.getNext() != null)
+                {
+                    lastNode = lastNode.getNext();
+                }
 
-    public static String hotspotPrinter(station s)
-    {
-        String output = "";
+                if(lastNode != compareNode && lastNode != bigCompare)
+                {
+                    result.add(lastNode);
+                    compareNode = lastNode;
+                    bigCompare = lastNode;
+                    break;
+                }
+            }
+        }
 
-        //
-
-        return output;
+        return result;
     }
 
     public static ArrayList<edges> collectEdges(ArrayList<hotspot> hList) 
