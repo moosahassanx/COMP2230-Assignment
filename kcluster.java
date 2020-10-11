@@ -167,35 +167,56 @@ class kcluster
             clusterArray.add(miniArray);
         }
 
-        DecimalFormat df = new DecimalFormat("###.##");
-
         for(int i = 0; i < stations; i++)
         {
             System.out.println("Station " + (i+1) + ": ");
-            System.out.println("Coordinates: (" + df.format(calculateXCentroid(clusterArray.get(i)))  + ", " + df.format(calculateYCentroid(clusterArray.get(i))) + ")");
+            System.out.println("Coordinates: (" + String.format("%4.2f", calculateXCentroid(clusterArray.get(i)))  + ", " + String.format("%4.2f", calculateYCentroid(clusterArray.get(i))) + ")");
             System.out.println("Hotspots: " + calculateHotspots(clusterArray.get(i)) + "\n");
         }
 
-        System.out.println("Inter-clustering distance: " + calculateIntercluster(clusterArray) + "\n");
+        System.out.println("Inter-clustering distance: " + String.format("%4.2f", calculateIntercluster(clusterArray)) + "\n");
         
     }
 
     public static double calculateIntercluster(ArrayList<ArrayList<hotspot>> clusterArray)
     {
-        double answer = 10000000;        // big number to start it off with
+        double min = Double.MAX_VALUE;        // big number to start it off with
 
-        // TODO: make an algorithm to compare all the mini arrays with each other
-        // - use Euclidean() for the calculations -> assign to temp value
-        // if temp value is smaller than answer, assign temp value to answer
+        // iterate forwards
+        for(int i = 0; i < clusterArray.size() - 1; i++)
+        {
+            // iterate backwards
+            for(int j = clusterArray.size() - 1; j > 0; j--)
+            {
+                // get element from forward cluster    
+                for(int k = 0; k < clusterArray.get(i).size(); k++)
+                {
+                    // get element from backward cluster
+                    for(int l = 0; l < clusterArray.get(j).size(); l++)
+                    {
+                        // euclidean distance formula
+                        double answer = Euclidean(clusterArray.get(i).get(k).getX(), clusterArray.get(i).get(k).getY(), clusterArray.get(j).get(l).getX(), clusterArray.get(j).get(l).getY());
 
-        return answer;
+                        System.out.println("cluster" + i + "(" + clusterArray.get(i).get(k).getID() + ") <----> cluster" + j + "(" + clusterArray.get(j).get(l).getID() + "): " + answer);
+
+                        // comparing to add
+                        if(answer < min)        
+                        {
+                            min = answer;
+                        }
+                    }
+                }
+            }
+        }
+
+        return min;
     }
 
-    public static double Euclidean(int x1, int y1, int x2, int y2)
+    public static double Euclidean(double x1, double y1, double x2, double y2)
     {
         // euclidean algorithm divided into 3 sections
-        float xCalc = ((x2 - x1) * (x2 - x1));
-        float yCalc = ((y2 - y1) * (y2 - y1));
+        double xCalc = ((x2 - x1) * (x2 - x1));
+        double yCalc = ((y2 - y1) * (y2 - y1));
         double answer = Math.sqrt(xCalc + yCalc);
 
         return answer;
