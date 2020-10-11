@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
+
 // INTER-CLUSTERING: distance between P3 and P4 = 5
 // INTRA-CLUSTERING: distance between P1 and P4 = 9.22
 
@@ -79,7 +80,7 @@ class kcluster
 
     }
 
-    public static void printGraph(ArrayList<hotspot> hList) 
+    public static void printGraph(ArrayList<hotspot> hList)
     {
         // staying element
         for (int i = 0; i < hList.size(); i++) 
@@ -96,7 +97,8 @@ class kcluster
                 if (answer == 0) 
                 {
                     System.out.print("0 ");
-                } else 
+                } 
+                else
                 {
                     DecimalFormat df = new DecimalFormat("###.##");
                     System.out.print(df.format(answer));
@@ -118,14 +120,13 @@ class kcluster
             stationList.add(new station());
         }
 
-        // TODO: make clusters based on number of fire stations <----------------------------
         makeClusters(hList, stations);
 
         // TODO: find out where the which hotspots are in which cluster
         // TODO: find out where the firestations would be located in that cluster
 
         // for each station
-        for (int i = 0; i < stations; i++) 
+        for (int i = 0; i < stations; i++)
         {
             System.out.println("Station " + (i + 1) + ": ");
             System.out.println("Coordinates: (" + stationList.get(i).getX() + ", " + stationList.get(i).getY() + ")");
@@ -135,11 +136,91 @@ class kcluster
 
     public static void makeClusters(ArrayList<hotspot> hList, int stations)
     {
-        System.out.println("number of clusters: " + stations);
         ArrayList<edges> edgeList = collectEdges(hList);
+        ArrayList<edges> MSTedges =  kruskals(edgeList, hList, stations);
 
-        kruskals(edgeList, hList);
+        System.out.println("Tree Construction: ");
+        for(int i = 0; i < MSTedges.size(); i++)
+        {
+            MSTedges.get(i).printer();
+        }
 
+        // transfer edges data to hotspots
+        for(int i = 0; i < MSTedges.size(); i++)
+        {
+            for(int j = 0; j < hList.size(); j++)
+            {
+                if(MSTedges.get(i).getSrc() == hList.get(j).getID())
+                {
+                    int destIndex = MSTedges.get(i).getDest() - 1;
+                    hList.get(j).setDestination(hList.get(destIndex));
+                }
+            }
+        }
+
+
+        // define clusters using that data on the hotspots
+        ArrayList<ArrayList<hotspot> > clusterOfEdges =  recTest(hList, stations);
+
+        for(hotspot h : hList)
+        {
+            if(h.getDestination() == null)
+            {
+                System.out.println(h.getID() + " -> null");
+            }
+            else
+            {
+                System.out.println(h.getID() + " -> " + h.getDestination().getID());
+            }
+        }
+
+        for(int i = 0; i < stations; i++)
+        {
+            //
+        }
+
+
+
+        /*
+        //TODO: COME BACK TO THIS
+        ArrayList<ArrayList<edges> > clusterOfEdges =  recTest(MSTedges, stations);
+
+        // big array iterator
+        for(int i = 0; i < clusterOfEdges.size(); i++)
+        {
+            // little array iterator
+            for(int j = 0; j < clusterOfEdges.get(i).size(); j++)
+            {
+                //
+            }
+        }
+        */
+
+    }
+
+    public static ArrayList<ArrayList<hotspot> > recTest(ArrayList<hotspot> eList, int clusters)
+    {
+        ArrayList<ArrayList<hotspot> > clusterOfEdges = new ArrayList<ArrayList<hotspot> >();
+
+        //
+        for(int i = 0; i < clusters; i++)
+        {
+            ArrayList<hotspot> miniList = new ArrayList<hotspot>();
+
+            miniList = makeMiniTree(eList);
+
+            clusterOfEdges.add(miniList);
+        }
+
+        return clusterOfEdges;
+        
+    }
+
+    public static ArrayList<hotspot> makeMiniTree(ArrayList<hotspot> bigTree)
+    {
+        ArrayList<hotspot> lilTree = new ArrayList<hotspot>();
+
+        return lilTree;
     }
 
     public static String hotspotPrinter(station s)
@@ -178,21 +259,16 @@ class kcluster
         return edgeList;
     }
 
-    public static void kruskals(ArrayList<edges> eList, ArrayList<hotspot> hList) 
+    public static ArrayList<edges> kruskals(ArrayList<edges> eList, ArrayList<hotspot> hList, int clusters)
     {
-        
         ArrayList<edges> result = new ArrayList<edges>();
 
         int e = 0;      // indexing for result[]
         int i = 0;      // indexing for sorted edges
+        int edgesNeeded = hList.size() - clusters;
 
         // sorting edges
         sortByWeight(eList);
-
-        for(int j = 0; j < eList.size(); j++)       // TESTING
-        {
-            eList.get(j).printer();
-        }
 
         subset[] subsets = new subset[hList.size()];
 
@@ -212,7 +288,7 @@ class kcluster
         i = 0;          // index used to pick next edge
 
         // number of edges to be taken is equal to hList.size()-1
-        while(e < hList.size() - 1)
+        while(e != edgesNeeded)
         {
             // pick the smallest edge and then increment the index for next iteration
             edges nextEdge = new edges();
@@ -230,11 +306,13 @@ class kcluster
             }
         }
 
-        System.out.println("MST Construction: ");
-        for(i = 0; i < e; i++)
-        {
-            result.get(i).printer();
+        // for id recognizing with hotspots
+        for (edges r : result) {
+            r.setSrc(r.getSrc() + 1);
+            r.setDest(r.getDest() + 1);
         }
+
+        return result;
     }
 
     private static void Union(subset[] subsets, int x, int y) 
@@ -270,10 +348,16 @@ class kcluster
         return subsets[i].parent;
     }
 
-    // comparator method
+    // comparator methods
     public static ArrayList<edges> sortByWeight(ArrayList<edges> eList) 
     {
         Collections.sort(eList, Comparator.comparing(edges::getWeight).thenComparing(edges::getWeight));
+        return eList;
+    }
+
+    public static ArrayList<edges> sortBySrc(ArrayList<edges> eList)
+    {
+        Collections.sort(eList, Comparator.comparing(edges::getSrc).thenComparing(edges::getSrc));
         return eList;
     }
     
