@@ -6,12 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
-
-// INTER-CLUSTERING: distance between P3 and P4 = 5
-// INTRA-CLUSTERING: distance between P1 and P4 = 9.22
-
-// CENTROID: average x-coordinates of all the points in the cluster (and same thing with y)
-
 class kcluster 
 {
     public static void main(String[] args) throws FileNotFoundException
@@ -72,9 +66,7 @@ class kcluster
         System.out.println("There are " + hotspotList.size() + " hotspots.");
         System.out.println("You have requested " + fireStations + " temporary fire stations. \n");
 
-        locateStations(hotspotList, fireStations);      // TODO: do firestation coding
-
-        System.out.println("Inter-clustering distance: " + 5.00 + "\n"); // TODO: replace 5
+        locateStations(hotspotList, fireStations);
 
         System.out.println("Thank you for using Kruskal’s Clustering. Bye.");
 
@@ -94,7 +86,7 @@ class kcluster
                 double answer = Math.sqrt(xCalc + yCalc);
 
                 // displaying output
-                if (answer == 0) 
+                if (answer == 0)
                 {
                     System.out.print("0 ");
                 } 
@@ -121,23 +113,6 @@ class kcluster
         }
 
         makeClusters(hList, stations);
-
-        // for each station
-        for (int i = 0; i < stations; i++)
-        {
-            System.out.println("Station " + (i + 1) + ": ");
-            System.out.println("Coordinates: (" + stationList.get(i).getX() + ", " + stationList.get(i).getY() + ")");
-            System.out.println("Hotspots: " + hotspotPrinter(stationList.get(i)) + "\n");
-        }
-    }
-
-    public static String hotspotPrinter(station s)
-    {
-        String output = "";
-
-        //
-
-        return output;
     }
 
     public static void makeClusters(ArrayList<hotspot> hList, int stations)
@@ -192,17 +167,91 @@ class kcluster
             clusterArray.add(miniArray);
         }
 
-        for(int i = 0; i < clusterArray.size(); i++)
+        DecimalFormat df = new DecimalFormat("###.##");
+
+        for(int i = 0; i < stations; i++)
         {
-            System.out.println("cluster " + (i+1));
-            for(int j = 0; j < clusterArray.get(i).size(); j++)
-            {
-                System.out.println(clusterArray.get(i).get(j).getID());
-            }
-            System.out.println();
+            System.out.println("Station " + (i+1) + ": ");
+            System.out.println("Coordinates: (" + df.format(calculateXCentroid(clusterArray.get(i)))  + ", " + df.format(calculateYCentroid(clusterArray.get(i))) + ")");
+            System.out.println("Hotspots: " + calculateHotspots(clusterArray.get(i)) + "\n");
         }
 
+        System.out.println("Inter-clustering distance: " + calculateIntercluster(clusterArray) + "\n");
         
+    }
+
+    public static double calculateIntercluster(ArrayList<ArrayList<hotspot>> clusterArray)
+    {
+        double answer = 10000000;        // big number to start it off with
+
+        // TODO: make an algorithm to compare all the mini arrays with each other
+        // - use Euclidean() for the calculations -> assign to temp value
+        // if temp value is smaller than answer, assign temp value to answer
+
+        return answer;
+    }
+
+    public static double Euclidean(int x1, int y1, int x2, int y2)
+    {
+        // euclidean algorithm divided into 3 sections
+        float xCalc = ((x2 - x1) * (x2 - x1));
+        float yCalc = ((y2 - y1) * (y2 - y1));
+        double answer = Math.sqrt(xCalc + yCalc);
+
+        return answer;
+    }
+
+    public static String calculateHotspots(ArrayList<hotspot> miniCluster)
+    {
+        String output = "{";
+
+        sortById(miniCluster);
+
+        for(int i = 0; i < miniCluster.size(); i++)
+        {
+            if(i == 0)
+            {
+                output += miniCluster.get(i).getID();
+            }
+            else
+            {
+                output += "," + miniCluster.get(i).getID();
+            }
+        }
+
+        output += "}";
+
+        return output;
+    }
+
+    public static double calculateXCentroid(ArrayList<hotspot> miniCluster)
+    {
+        double total = 0;
+        double result = 0;
+
+        for(int i = 0; i < miniCluster.size(); i++)
+        {
+            total += miniCluster.get(i).getX();
+        }
+
+        result = total / miniCluster.size();
+
+        return result;
+    }
+
+    public static double calculateYCentroid(ArrayList<hotspot> miniCluster)
+    {
+        double total = 0;
+        double result = 0;
+
+        for(int i = 0; i < miniCluster.size(); i++)
+        {
+            total += miniCluster.get(i).getY();
+        }
+
+        result = total / miniCluster.size();
+
+        return result;
     }
 
     public static ArrayList<hotspot> clusterMaker(ArrayList<hotspot> hList, int clusters)
@@ -222,8 +271,10 @@ class kcluster
                     lastNode = lastNode.getNext();
                 }
 
+                // unique criteria
                 if(lastNode != compareNode && lastNode != bigCompare)
                 {
+                    // add node if unique
                     result.add(lastNode);
                     compareNode = lastNode;
                     bigCompare = lastNode;
@@ -362,6 +413,12 @@ class kcluster
     {
         Collections.sort(eList, Comparator.comparing(edges::getSrc).thenComparing(edges::getSrc));
         return eList;
+    }
+
+    public static ArrayList<hotspot> sortById(ArrayList<hotspot> hList)
+    {
+        Collections.sort(hList, Comparator.comparing(hotspot::getID).thenComparing(hotspot::getID));
+        return hList;
     }
     
 }
