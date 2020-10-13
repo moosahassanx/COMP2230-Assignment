@@ -178,7 +178,7 @@ class kcluster
         
     }
 
-    public static double calculateIntercluster(ArrayList<ArrayList<hotspot>> clusterArray)
+    public static double calculateIntercluster(ArrayList<ArrayList<hotspot>> clusterArray)      // TODO: fix this algorithm
     {
         double min = Double.MAX_VALUE;        // big number to start it off with
 
@@ -194,15 +194,16 @@ class kcluster
                     // get element from backward cluster
                     for(int l = 0; l < clusterArray.get(j).size(); l++)
                     {
-                        // euclidean distance formula
-                        double answer = Euclidean(clusterArray.get(i).get(k).getX(), clusterArray.get(i).get(k).getY(), clusterArray.get(j).get(l).getX(), clusterArray.get(j).get(l).getY());
-
-                        System.out.println("cluster" + i + "(" + clusterArray.get(i).get(k).getID() + ") <----> cluster" + j + "(" + clusterArray.get(j).get(l).getID() + "): " + answer);
-
-                        // comparing to add
-                        if(answer < min)        
+                        if(i != j)
                         {
-                            min = answer;
+                            // euclidean distance formula
+                            double answer = Euclidean(clusterArray.get(i).get(k).getX(), clusterArray.get(i).get(k).getY(), clusterArray.get(j).get(l).getX(), clusterArray.get(j).get(l).getY());
+
+                            // comparing to add
+                            if(answer < min)
+                            {
+                                min = answer;
+                            }
                         }
                     }
                 }
@@ -279,11 +280,9 @@ class kcluster
     {
         ArrayList<hotspot> result = new ArrayList<hotspot>();
 
-        hotspot bigCompare = new hotspot();
         for(int j = 0; j < clusters; j++)
         {
             // find last node
-            hotspot compareNode = new hotspot();
             for(int i = 0; i < hList.size(); i++)
             {
                 hotspot lastNode = hList.get(i);
@@ -292,13 +291,19 @@ class kcluster
                     lastNode = lastNode.getNext();
                 }
 
-                // unique criteria
-                if(lastNode != compareNode && lastNode != bigCompare)
+                // check for previous last nodes
+                boolean doesExist = false;
+                for(int k = 0; k < result.size(); k++)
+                {
+                    if(result.get(k) == lastNode)
+                    {
+                        doesExist = true;
+                    }
+                }
+                if(doesExist != true)
                 {
                     // add node if unique
                     result.add(lastNode);
-                    compareNode = lastNode;
-                    bigCompare = lastNode;
                     break;
                 }
             }
@@ -312,7 +317,7 @@ class kcluster
         ArrayList<edges> edgeList = new ArrayList<edges>();
 
         // staying element
-        for (int i = 0; i < hList.size(); i++) 
+        for (int i = 0; i < hList.size(); i++)
         {
             // iterating element
             for (int j = 0; j < hList.size(); j++) 

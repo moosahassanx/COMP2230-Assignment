@@ -16,7 +16,7 @@
                 ".",
                 "${fileDirname}"
             ],
-            "args":["input.txt", "3"]
+            "args":["input.txt", "2"]
         },
         {
             "name": "Java Console App",
