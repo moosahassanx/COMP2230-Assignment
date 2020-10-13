@@ -1,3 +1,10 @@
+// TITLE: 					Algorithms Assignment
+// COURSE: 					COMP2230
+// AUTHOR: 					Moosa Hassan
+// STUDENT NUMBER: 			3331532
+// DATE: 					24/10/2020 
+// DESCRIPTION: 			stores the length of the edge, which node the line is being drawn from and which direction the line will go
+
 public class edges 
 {
     // attributes
@@ -12,48 +19,44 @@ public class edges
         this.dest = 0;
         this.weight = 0;
     }
-    public edges(int s, int d, double w)
-    {
+    public edges(final int s, final int d, final double w) {
         this.src = s;
         this.dest = d;
         this.weight = w;
     }
 
     // acessors
-    public int getSrc()
-    {
+    public int getSrc() {
         return this.src;
     }
-    public int getDest()
-    {
+
+    public int getDest() {
         return this.dest;
     }
-    public double getWeight()
-    {
+
+    public double getWeight() {
         return this.weight;
     }
 
     // mutators
-    public void setSrc(int s)
-    {
+    public void setSrc(final int s) {
         this.src = s;
     }
-    public void setDest(int d)
-    {
+
+    public void setDest(final int d) {
         this.dest = d;
     }
-    public void setWeight(double w)
-    {
+
+    public void setWeight(final double w) {
         this.weight = w;
     }
 
     // methods
-    public void printer()
-    {
+    public void printer() {
         System.out.println("NODE(" + this.src + ") -> NODE(" + this.dest + "): " + this.weight);
     }
 
-    int find(subset subsets[], int i)       // find set element of i
+    int find(final subset subsets[], final int i) // find set element of i
     {
         // find root and make root as parent of i (path compression) 
         if(subsets[i].parent != i)
