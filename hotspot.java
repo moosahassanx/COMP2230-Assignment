@@ -15,7 +15,8 @@ public class hotspot
     private hotspot previous;
 
     // constructors
-    public hotspot() {
+    public hotspot() 
+    {
         this.ID = 0;
         this.xCoord = 0;
         this.yCoord = 0;
@@ -23,7 +24,8 @@ public class hotspot
         this.previous = null;
     }
 
-    public hotspot(final int i, final float x, final float y) {
+    public hotspot(final int i, final float x, final float y) 
+    {
         this.ID = i;
         this.xCoord = x;
         this.yCoord = y;
@@ -32,28 +34,34 @@ public class hotspot
     }
 
     // accessors
-    public int getID() {
+    public int getID() 
+    {
         return this.ID;
     }
 
-    public float getX() {
+    public float getX() 
+    {
         return this.xCoord;
     }
 
-    public float getY() {
+    public float getY() 
+    {
         return this.yCoord;
     }
 
-    public hotspot getNext() {
+    public hotspot getNext() 
+    {
         return this.next;
     }
 
-    public hotspot getPrevious() {
+    public hotspot getPrevious() 
+    {
         return this.previous;
     }
 
     // mutators
-    public void setNext(final hotspot d) {
+    public void setNext(final hotspot d) 
+    {
         this.next = d;
     }
 

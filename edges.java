@@ -19,40 +19,48 @@ public class edges
         this.dest = 0;
         this.weight = 0;
     }
-    public edges(final int s, final int d, final double w) {
+    public edges(final int s, final int d, final double w) 
+    {
         this.src = s;
         this.dest = d;
         this.weight = w;
     }
 
     // acessors
-    public int getSrc() {
+    public int getSrc() 
+    {
         return this.src;
     }
 
-    public int getDest() {
+    public int getDest() 
+    {
         return this.dest;
     }
 
-    public double getWeight() {
+    public double getWeight() 
+    {
         return this.weight;
     }
 
     // mutators
-    public void setSrc(final int s) {
+    public void setSrc(final int s) 
+    {
         this.src = s;
     }
 
-    public void setDest(final int d) {
+    public void setDest(final int d) 
+    {
         this.dest = d;
     }
 
-    public void setWeight(final double w) {
+    public void setWeight(final double w) 
+    {
         this.weight = w;
     }
 
     // methods
-    public void printer() {
+    public void printer() 
+    {
         System.out.println("NODE(" + this.src + ") -> NODE(" + this.dest + "): " + this.weight);
     }
 
