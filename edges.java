@@ -76,6 +76,7 @@ public class edges
 
 }
 
+// mst joining
 class subset
 {
     int parent, rank;

@@ -23,7 +23,6 @@ public class hotspot
         this.next = null;
         this.previous = null;
     }
-
     public hotspot(final int i, final float x, final float y) 
     {
         this.ID = i;

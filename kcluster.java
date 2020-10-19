@@ -2,7 +2,7 @@
 // COURSE: 					COMP2230
 // AUTHOR: 					Moosa Hassan
 // STUDENT NUMBER: 			3331532
-// DATE: 					24/10/2020 
+// DATE: 					24/10/2020
 // DESCRIPTION: 			main file - reads data and does essentially all of the calculations (kruskals, interclustering, ...)
 
 import java.io.File;
@@ -13,44 +13,45 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
-class kcluster 
+class kcluster
 {
-    public static void main(final String[] args) throws FileNotFoundException 
+    public static void main(final String[] args) throws FileNotFoundException
     {
         // error report
-        if (args[0] == null || args[1] == null || args == null) 
+        if(args.length != 2)
         {
             // not enough parameters
-            System.out.println("USAGE: java kcluster [file_name].txt [integer value]");
+            System.err.println("USAGE: java kcluster [file_name].txt [integer value]");
             return;
-        } 
+        }
         else if (!(args[0].contains(".txt"))) 
         {
             // first parameter was not a string with .txt extension was not inputted
-            System.out.println("USAGE: java kcluster [file_name].txt [integer value]");
+            System.err.println("USAGE: java kcluster [file_name].txt [integer value]");
             return;
-        } 
+        }
         else if (!(args[1].matches(".*\\d.*"))) 
         {
             // second parameter was not an int
-            System.out.println("USAGE: java kcluster [file_name].txt [integer value]");
+            System.err.println("USAGE: java kcluster [file_name].txt [integer value]");
             return;
         }
 
         // fetching data from parameters
-        final Scanner file = new Scanner(new File(args[0])); // ID, x-coord, y-coord
         final int fireStations = Integer.parseInt(args[1]);
 
         final ArrayList<hotspot> hotspotList = new ArrayList<hotspot>();
 
         try 
         {
+            final Scanner file = new Scanner(new File(args[0]));
+
             while (file.hasNext()) 
             {
                 final String newText = file.nextLine();
 
                 final String[] splitStr = newText.split(",");
-                final int id = Integer.parseInt(splitStr[0]); // retrieving ID
+                final int id = Integer.parseInt(splitStr[0]);       // retrieving ID
                 final float xCoord = Float.parseFloat(splitStr[1]); // retrieving x-coordinate
                 final float yCoord = Float.parseFloat(splitStr[2]); // retrieving y-coordinate
 
@@ -61,7 +62,14 @@ class kcluster
         } 
         catch (final Exception e) 
         {
-            System.out.println("File reading error: " + e);
+            System.err.println(e);
+            return;
+        }
+
+        if(fireStations <= 0 || fireStations > hotspotList.size())
+        {
+            System.err.println("ERROR: number of stations is invalid, must be between 1 - number of hotspots. \n");
+            return;
         }
 
         // output
@@ -80,13 +88,13 @@ class kcluster
 
     }
 
-    public static void printGraph(final ArrayList<hotspot> hList) 
+    public static void printGraph(final ArrayList<hotspot> hList)
     {
         // staying element
-        for (int i = 0; i < hList.size(); i++) 
+        for (int i = 0; i < hList.size(); i++)
         {
             // iterating element
-            for (int j = 0; j < hList.size(); j++) 
+            for (int j = 0; j < hList.size(); j++)
             {
                 // euclidean algorithm divided into 3 sections
                 final float xCalc = ((hList.get(i).getX() - hList.get(j).getX()) * (hList.get(i).getX() - hList.get(j).getX()));
@@ -94,10 +102,11 @@ class kcluster
                 final double answer = Math.sqrt(xCalc + yCalc);
 
                 // displaying output
-                if (answer == 0) 
+                if (answer == 0)
                 {
                     System.out.print("0 ");
-                } else 
+                } 
+                else 
                 {
                     final DecimalFormat df = new DecimalFormat("###.##");
                     System.out.print(df.format(answer));
@@ -109,7 +118,7 @@ class kcluster
         System.out.println(); // spacing
     }
 
-    public static void locateStations(final ArrayList<hotspot> hList, final int stations) 
+    public static void locateStations(final ArrayList<hotspot> hList, final int stations)
     {
         makeClusters(hList, stations);
     }
@@ -122,20 +131,20 @@ class kcluster
         // transfer edges data to hotspots
         for (int i = 0; i < MSTedges.size(); i++)
         {
-            for (int j = 0; j < hList.size(); j++) 
+            for (int j = 0; j < hList.size(); j++)
             {
-                if (MSTedges.get(i).getSrc() == hList.get(j).getID()) 
+                if (MSTedges.get(i).getSrc() == hList.get(j).getID())
                 {
                     final int destIndex = MSTedges.get(i).getDest() - 1;
                     hList.get(j).setNext(hList.get(destIndex));
                 }
             }
         }
-        for (int i = 0; i < MSTedges.size(); i++) 
+        for (int i = 0; i < MSTedges.size(); i++)
         {
-            for (int j = 0; j < hList.size(); j++) 
+            for (int j = 0; j < hList.size(); j++)
             {
-                if (MSTedges.get(i).getDest() == hList.get(j).getID()) 
+                if (MSTedges.get(i).getDest() == hList.get(j).getID())
                 {
                     final int srcIndex = MSTedges.get(i).getSrc() - 1;
                     hList.get(j).setPrevious(hList.get(srcIndex));
@@ -146,9 +155,8 @@ class kcluster
         // define clusters using that data on the hotspots
         hList = clusterMaker(hList, stations);
 
-        // arraylists of arraylists
+        // using arraylists of arraylists of hotspots for easier iteration
         final ArrayList<ArrayList<hotspot>> clusterArray = new ArrayList<ArrayList<hotspot>>();
-
         for (int i = 0; i < hList.size(); i++) 
         {
             final ArrayList<hotspot> miniArray = new ArrayList<hotspot>();
@@ -156,7 +164,7 @@ class kcluster
             hotspot currentNode = hList.get(i);
             miniArray.add(currentNode);
 
-            while (currentNode.getPrevious() != null) 
+            while (currentNode.getPrevious() != null)
             {
                 final hotspot tempNode = currentNode.getPrevious();
                 miniArray.add(tempNode);
@@ -166,6 +174,7 @@ class kcluster
             clusterArray.add(miniArray);
         }
 
+        // output stations and results
         for (int i = 0; i < stations; i++) 
         {
             System.out.println("Station " + (i + 1) + ": ");
@@ -174,7 +183,16 @@ class kcluster
             System.out.println("Hotspots: " + calculateHotspots(clusterArray.get(i)) + "\n");
         }
 
-        System.out.println("Inter-clustering distance: " + String.format("%4.2f", calculateIntercluster(clusterArray)) + "\n");
+        // 1 cluster
+        if(stations == 1)
+        {
+            System.out.println("Inter-clustering distance: 0.00 \n");
+        }
+        // more than 1 cluster
+        else
+        {
+            System.out.println("Inter-clustering distance: " + String.format("%4.2f", calculateIntercluster(clusterArray)) + "\n");
+        }
 
     }
 
