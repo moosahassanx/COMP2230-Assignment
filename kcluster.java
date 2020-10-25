@@ -199,7 +199,7 @@ class kcluster
     public static double calculateIntercluster(final ArrayList<ArrayList<hotspot>> clusterArray) 
     {
         double min = Double.MAX_VALUE; // start with biggest number possible
-
+        
         // iterate forwards
         for (int i = 0; i < clusterArray.size() - 1; i++) 
         {
